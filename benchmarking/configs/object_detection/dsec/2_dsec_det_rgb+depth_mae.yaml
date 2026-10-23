@@ -1,0 +1,23 @@
+experiment_name: 2_det_dsec_det_rgb+depth_mae
+task: detection
+backbone: facebook/vit-mae-base
+num_classes: 2
+modalities: [rgb, depth]
+modality_channels: {rgb: 3, depth: 1}
+data_root: ./data/dsec
+layer_decay: 1.0
+adam_betas: [0.9, 0.999]
+color_jitter: 0.4
+lsj_scale: [0.5, 2.0]
+lr: 0.0001
+backbone_lr: 1.0e-05
+num_warmup_epochs: 5
+decay_type: none
+gradient_clip_val: 0.1
+batch_size: 4
+accumulate_grad_batches: 16
+weight_decay: 0.1
+drop_path_rate: 0.1
+head_type: cascade_rcnn
+image_size: [480, 640]
+epochs: 30

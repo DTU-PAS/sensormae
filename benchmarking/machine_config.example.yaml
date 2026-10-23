@@ -1,0 +1,13 @@
+# Machine-specific settings. Copy to machine_config.yaml (not versioned); these values
+# override the same keys of every experiment config.
+
+# Checkpoints, TensorBoard logs and test results
+logs_folder: "./logs"
+
+# Folder with one sub-folder per dataset (see README)
+data_root: "./data"
+
+# Weights & Biases logging (TensorBoard is always used)
+wandb: false
+wandb_project: "sensormae-benchmarking"
+# wandb_entity: "your-entity"

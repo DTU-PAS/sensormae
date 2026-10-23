@@ -1,0 +1,60 @@
+# NTU4DRadLM camera calibration used by the extraction (from the NTU4DRadLM release).
+
+#--------------------------------------------------------------------------------------------
+# RGB Camera
+#--------------------------------------------------------------------------------------------
+
+rgb_topic: /rgb_cam/image_raw/compressed
+rgb_camera_info_topic: /
+
+## Camera parameters
+K_rgb: [
+  332.232689, 0.0, 333.058485,
+  0.0, 332.644823, 240.998586,
+  0.0, 0.0, 1.0
+]
+D_rgb: [
+  0.011770,
+ -0.041851,
+  0.000701,
+ -0.000319,
+  0.0
+]
+Dmodel_rgb: plumb_bob
+w_rgb: 640
+h_rgb: 480
+
+#--------------------------------------------------------------------------------------------
+# LWIR Camera
+#--------------------------------------------------------------------------------------------
+
+lwir_topic: /thermal_cam/thermal_image/compressed
+lwir_camera_info_topic: /
+
+## Camera parameters
+K_lwir: [
+  471.9635132410409, 0.0, 339.0306612869422,
+  0.0, 472.4864274830905, 277.7407371711671,
+  0.0, 0.0, 1.0
+]
+D_lwir: [
+  -0.1856695477974904,
+   0.16745260846914475,
+  -0.00018122010952647307,
+   0.00008653403784267396,
+  -0.10770856460153226
+]
+Dmodel_lwir: plumb_bob
+w_lwir: 640
+h_lwir: 512
+
+# Extrinsic parameters (i.e. pose of the thermal camera in the RGB camera frame)
+# e.g. use https://www.andre-gaschler.com/rotationconverter/ to convert rotation
+# T: [Tx, Ty, Tz]
+# R: [Rxx, Rxy, Rxz, Ryx, Ryy, Ryz, Rzx, Rzy, Rzz]
+
+T_lwir2rgb: [0.091861626,  0.0104885333, 0.0404970719]
+
+R_lwir2rgb: [[0.9999412972,  -0.0107500988, 0.0020706194],
+                [0.0106887324,  0.9995461525, -0.0282081488],
+                [0.0023716929,  0.0281855952,  0.9996012105]]

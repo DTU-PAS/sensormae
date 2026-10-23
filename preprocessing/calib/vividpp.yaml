@@ -1,0 +1,65 @@
+# Vivid++ driving setup: camera calibration used by the extraction (from the Vivid++ release).
+
+#--------------------------------------------------------------------------------------------
+# RGB Camera
+#--------------------------------------------------------------------------------------------
+
+rgb_topic: /camera/image_color
+rgb_camera_info_topic: /camera/camera_info
+
+# rgb_topic: /rgb/image   # Note: For handheld dataset. Is another cam with different res. see https://visibilitydataset.github.io/2_sequences.html
+# rgb_camera_info_topic: /rgb/camera_info
+
+
+
+## Camera parameters
+# camera matrix: [fx, 0.0, cx, 0.0, fy, cy, 0.0, 0.0, 1.0]
+K_rgb: [702.6030497884977, 0.0, 644.9296487349911, 0.0, 703.4541726858521, 526.4572414665469, 0.0, 0.0, 1.0]
+D_rgb: [0.5424763304847061, -1.7515099175022195, 6.050489512760127, -5.786170959900578]
+Dmodel_rgb: equidistant
+w_rgb: 1280
+h_rgb: 1024
+
+
+#--------------------------------------------------------------------------------------------
+# Thermal Camera
+#--------------------------------------------------------------------------------------------
+
+lwir_topic: /thermal/image_raw
+lwir_camera_info_topic: /thermal/camera_info
+
+## Camera parameters
+K_lwir: [445.34173838383924, 0.0, 310.74708274781557, 0.0, 446.40695195454197, 249.54892754326676, 0.0, 0.0, 1.0]
+D_lwir: [0.248994091117758, -2.909390816436668, 8.052903070857168, -7.363581411738435]
+Dmodel_lwir: equidistant
+w_lwir: 640
+h_lwir: 512
+
+
+# Extrinsic parameters (i.e. pose of the thermal camera in the RGB camera frame)
+# e.g. use https://www.andre-gaschler.com/rotationconverter/ to convert rotation
+# T: [Tx, Ty, Tz]
+# R: [Rxx, Rxy, Rxz, Ryx, Ryy, Ryz, Rzx, Rzy, Rzz]
+T_lwir2rgb: [0.08100941, -0.00931803, 0.01028074]
+R_lwir2rgb: [[9.99954246e-01, -9.55124750e-03, 5.29375004e-04],
+                [9.56042812e-03, 9.99722735e-01, -2.15186050e-02],
+                [-3.23698705e-04, 2.15226815e-02, 9.99768308e-01]]
+
+
+#--------------------------------------------------------------------------------------------
+# Event Camera
+#--------------------------------------------------------------------------------------------
+event_topic: /dvs/events
+
+K_event: [783.3165271727371, 0.0, 307.3880210739028, 0.0, 779.7937766565468, 249.36584845950097, 0.0, 0.0, 1.0]
+D_event: [-0.4281339311458361, 0.771092080601114, -0.00010143891680090658, -0.0014392819462272514]
+Dmodel_event: radtan
+w_event: 640
+h_event: 480
+
+# Extrinsic parameters (i.e. pose of the event camera in the RGB camera frame):
+# inverse of T_cn_cnm1 in calibration_results/driving_results/camchain-dvsrgb.yaml
+T_event2rgb: [0.129494552078, 0.00604077009904, -0.000525877032448]
+R_event2rgb: [[0.999834253726, -0.010003807283, 0.01521147314],
+               [0.0100058524943, 0.999949938503, -5.83496475756e-05],
+               [-0.0152101279122, 0.000210543732799, 0.999884297147]]

@@ -1,0 +1,23 @@
+experiment_name: 2_seg_dsec_seg_event_depth_mae
+task: segmentation
+backbone: facebook/vit-mae-base
+num_classes: 11
+modalities: [event, depth]
+modality_channels: {event: 10, depth: 1}
+data_root: ./data/dsec
+layer_decay: 0.75
+adam_betas: [0.9, 0.999]
+color_jitter: 0.4
+lsj_scale: [0.8, 1.5]
+lr: 0.0002
+backbone_lr: 0.0001
+gradient_clip_val: 1.0
+batch_size: 4
+accumulate_grad_batches: 16
+weight_decay: 0.05
+drop_path_rate: 0.1
+decay_type: cosine
+min_lr: 1.0e-06
+num_warmup_epochs: 20
+image_size: [640, 640]
+epochs: 200

@@ -1,0 +1,23 @@
+experiment_name: 1_seg_fmb_seg_rgb_sensormae_base_mm
+task: segmentation
+backbone: ./weights/sensormae-base-mm.pth
+num_classes: 15
+modalities: [rgb]
+modality_channels: {rgb: 3}
+data_root: ./data/fmb
+layer_decay: 0.75
+adam_betas: [0.9, 0.999]
+color_jitter: 0.4
+lsj_scale: [0.8, 1.5]
+lr: 0.001
+backbone_lr: 0.0002
+gradient_clip_val: 5.0
+batch_size: 16
+accumulate_grad_batches: 4
+weight_decay: 0.05
+drop_path_rate: 0.1
+decay_type: cosine
+min_lr: 1.0e-06
+num_warmup_epochs: 10
+image_size: [480, 480]
+epochs: 250

@@ -1,0 +1,10 @@
+/data
+/weights
+/logs
+/wandb
+/visualizations
+/machine_config.yaml
+/configs/object_detection/stf/seeds/
+__pycache__/
+*.ckpt
+*.xlsx

@@ -1,0 +1,23 @@
+experiment_name: 1_det_llvip_rgb_mae
+task: detection
+backbone: facebook/vit-mae-base
+num_classes: 1
+modalities: [rgb]
+modality_channels: {rgb: 3}
+data_root: ./data/llvip
+layer_decay: 1.0
+adam_betas: [0.9, 0.999]
+color_jitter: 0.4
+lsj_scale: [0.5, 2.0]
+lr: 0.0001
+backbone_lr: 1.0e-05
+num_warmup_epochs: 5
+decay_type: none
+gradient_clip_val: 0.1
+batch_size: 32
+accumulate_grad_batches: 2
+weight_decay: 0.1
+drop_path_rate: 0.1
+head_type: cascade_rcnn
+image_size: [608, 768]
+epochs: 50
