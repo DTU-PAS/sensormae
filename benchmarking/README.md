@@ -108,13 +108,19 @@ Files derived from the official releases are created with the scripts in
 # LLVIP: COCO annotations from the VOC files
 python data_preparation/llvip.py --root ./data/llvip
 
-# STF: LiDAR / radar projected onto the RGB crop of the gated camera
+# KITTI: train / val split (data_preparation/kitti_splits) and dense LiDAR depth
+python data_preparation/kitti.py --kitti /path/to/kitti --out ./data/kitti
+
+# STF: LiDAR / radar projected onto the RGB crop of the gated camera, dense LiDAR depth
 git clone https://github.com/princeton-computational-imaging/SeeingThroughFog
 pip install pyquaternion
 python data_preparation/stf.py --root ./data/stf --stf_repo SeeingThroughFog
 ```
 
 The STF splits are the official ones of the SeeingThroughFog repository.
+
+The LiDAR and radar images are 16-bit PNGs, but `src/data/stf.py` opens them with PIL, which
+reads 16-bit RGB PNGs as 8-bit and keeps the high byte only (empty pixels, 20000, become 78).
 
 DSEC is converted to one h5 file per sequence from the official DSEC images, events and
 calibration, the [DSEC-Det](https://github.com/uzh-rpg/dsec-det) labels and the

@@ -5,6 +5,11 @@ Every pixel hit by a point stores (y, z, intensity) for the LiDAR and (y, z, vel
 the radar, in camera coordinates, encoded as uint16 (value + 200) * 100; empty pixels hold
 20000. Radar targets fill their whole image column (nearest target wins).
 
+Depth: the LiDAR points (beyond 1.5 m) are projected into the RGB crop used by the loader (rows 230-950,
+columns 290-1570, 1280x720) and linearly interpolated over their Delaunay triangulation
+(as for KITTI); the metric depth is inverted and scaled to [0, 1] between the 1st and 99th
+depth percentile of the frame (float32, 0 = no depth).
+
 Uses the dataset tools of the official repository:
 
     git clone https://github.com/princeton-computational-imaging/SeeingThroughFog
@@ -12,8 +17,9 @@ Uses the dataset tools of the official repository:
 
     python data_preparation/stf.py --root data/stf --stf_repo SeeingThroughFog
 
-Writes stf/lidar_samples/yzi/lidar_hdl64_strongest/<sample>.png and
-stf/radar_samples/yzv/<sample>.png for every sample of splits/all.txt.
+Writes stf/lidar_samples/yzi/lidar_hdl64_strongest/<sample>.png,
+stf/radar_samples/yzv/<sample>.png and stf/depth_maps/<sample>.npy for every sample of
+splits/all.txt.
 """
 
 import argparse
@@ -22,12 +28,14 @@ import sys
 
 import cv2
 import numpy as np
+from scipy.interpolate import LinearNDInterpolator
 from tqdm import tqdm
 
 LIDAR_SCALE = 100
 SHIFT = 200
 MIN_DISTANCE = 1.5  # LiDAR points closer than this (m) are dropped
 MIN_X = 2.5  # points behind this plane (m, sensor x) are dropped
+DEPTH_CROP = (230, 950, 290, 1570)  # RGB crop of the loader (y0, y1, x0, x1)
 
 
 def project(points, vtc, sensor_to_camera, crop):
@@ -75,6 +83,28 @@ def create_img(img_coordinates, pts_3d, crop, radar=False):
     return image.transpose([1, 0, 2]).squeeze()
 
 
+def delaunay_depth(points, vtc, velodyne_to_camera):
+    """Dense metric depth (720, 1280) in the depth crop, 0 outside the triangulation."""
+    y0, y1, x0, x1 = DEPTH_CROP
+    width, height = x1 - x0, y1 - y0
+    xyz1 = np.c_[points[:, 0:3], np.ones(len(points))]
+    z = (xyz1 @ velodyne_to_camera.T)[:, 2]
+    uvw = xyz1 @ (np.array([[1, 0, -x0], [0, 1, -y0], [0, 0, 1]]) @ vtc).T
+    front = z > 0.1
+    uv, z = uvw[front, :2] / uvw[front, 2:3], z[front]
+    keep = (uv[:, 0] >= 0) & (uv[:, 0] < width) & (uv[:, 1] >= 0) & (uv[:, 1] < height)
+    interp = LinearNDInterpolator(uv[keep], z[keep], fill_value=0.0)
+    gx, gy = np.meshgrid(np.arange(width), np.arange(height))
+    return interp(gx, gy).astype(np.float32)
+
+
+def encode_depth(depth, low_percentile=1.0, high_percentile=99.0):
+    """[0, 1], near = 1, linear in depth between the frame's percentiles; 0 = no depth."""
+    valid = depth > 0
+    lo, hi = np.percentile(depth[valid], [low_percentile, high_percentile])
+    return np.where(valid, 1 - np.clip((depth - lo) / (hi - lo), 0, 1), 0).astype(np.float32)
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--root", default="data/stf")
@@ -100,18 +130,21 @@ def main():
 
     lidar_dir = os.path.join(args.root, "lidar_samples/yzi/lidar_hdl64_strongest")
     radar_dir = os.path.join(args.root, "radar_samples/yzv")
-    os.makedirs(lidar_dir, exist_ok=True)
-    os.makedirs(radar_dir, exist_ok=True)
+    depth_dir = os.path.join(args.root, "depth_maps")
+    for d in (lidar_dir, radar_dir, depth_dir):
+        os.makedirs(d, exist_ok=True)
 
     for sample in tqdm(samples):
         lidar_file = os.path.join(lidar_dir, sample + ".png")
         radar_file = os.path.join(radar_dir, sample + ".png")
-        if os.path.exists(lidar_file) and os.path.exists(radar_file):
+        depth_file = os.path.join(depth_dir, sample + ".npy")
+        if all(os.path.exists(f) for f in (lidar_file, radar_file, depth_file)):
             continue
 
         lidar = load_velodyne_scan(os.path.join(args.root, "lidar_hdl64_strongest", sample + ".bin"))
         distance = np.sqrt(lidar[:, 0] ** 2 + lidar[:, 1] ** 2 + lidar[:, 2] ** 2)
         lidar = lidar[distance > MIN_DISTANCE]
+        np.save(depth_file, encode_depth(delaunay_depth(lidar, vtc, velodyne_to_camera)))
         cv2.imwrite(lidar_file, create_img(*project(lidar, vtc, velodyne_to_camera, crop), crop))
 
         radar = load_radar_points(os.path.join(args.root, "radar_targets", sample + ".json"))

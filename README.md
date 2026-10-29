@@ -1,8 +1,16 @@
 
 # Do Pretrained Backbones Transfer to Physical Sensors?
 
-Official repository of the paper *"Do Pretrained Backbones Transfer to Physical Sensors? A
-Systematic Study of Multimodal Initialization Across the Sensor Stack"*.
+<p align="center">
+  <a href="https://wacv.thecvf.com/"><img src="https://img.shields.io/badge/WACV-2027-1f6feb" alt="WACV 2027"></a>
+  <a href="https://huggingface.co/dtu-pcas/sensormae"><img src="https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-weights-ffcc4d" alt="Weights on Hugging Face"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-green" alt="MIT license"></a>
+  <img src="https://img.shields.io/badge/python-3.13-3776ab?logo=python&logoColor=white" alt="Python 3.13">
+  <img src="https://img.shields.io/badge/PyTorch-2.8-ee4c2c?logo=pytorch&logoColor=white" alt="PyTorch 2.8">
+</p>
+
+Official repository of the WACV 2027 paper *"Do Pretrained Backbones Transfer to Physical
+Sensors? A Systematic Study of Multimodal Initialization Across the Sensor Stack"*.
 
 We pretrain **SensorMAE**, a multimodal masked autoencoder over the sensors found on
 robots and vehicles (RGB, thermal LWIR/MWIR, reflective NIR/SWIR, event cameras, stereo
@@ -71,6 +79,11 @@ hf download dtu-pcas/sensormae --include "*.pth" --local-dir weights
 python train.py --config configs/segmentation/mfnet/2_mfnet_rgb_lwir_sensormae_base_mm.yaml
 python test.py  --config configs/segmentation/mfnet/2_mfnet_rgb_lwir_sensormae_base_mm.yaml
 ```
+
+## Citation
+
+The paper has been accepted at WACV 2027; the BibTeX entry will be added here with the
+proceedings.
 
 ## License
 
